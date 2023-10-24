@@ -11,14 +11,13 @@ const useragent = require('express-useragent');
 
 
 const app = express();
-const port = 5000;
 app.use(express.static('public'))
 app.use(express.json());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: ['http://localhost:3000'],
+  origin: ['https://stawro.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -30,8 +29,16 @@ mongoose.connect('mongodb+srv://darshanckick:kick@cluster0.b9m2glb.mongodb.net/?
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB Connection Error:'));
+/*----------------------------------------------------*/
+const key = fs.readFileSync('private.key')
+const cert = fs.readFileSync('certificate.crt')
+const cred = {
+  key,
+  cert
+}
 
-
+const httpsServer = https.createServer(cred, app)
+httpsServer.listen(443);
 /* ------------------------------------------------------ data post and get 01  ------------------------------------------------  */
 const dataSchema = new mongoose.Schema({
     qno:Number,
@@ -4335,7 +4342,3 @@ app.post('/chek/star', async (req, res) => {
     res.status(200).json({Status : 'BAD'});
   }
 });
-
-app.listen(port, () => {
-    console.log(`Server Running on Port ${port} :`);
-})
